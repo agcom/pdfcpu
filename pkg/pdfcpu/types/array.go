@@ -223,8 +223,10 @@ func (a Array) PDFString() string {
 			continue
 		}
 
+		logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
+
 		if log.InfoEnabled() {
-			log.Info.Fatalf("PDFArray.PDFString(): entry of unknown object type: %[1]T %[1]v\n", entry)
+			log.Info.Printf("PDFArray.PDFString(): entry of unknown object type: %[1]T %[1]v\n", entry)
 		}
 	}
 
