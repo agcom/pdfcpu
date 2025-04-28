@@ -97,45 +97,38 @@ func (a Array) Clone() Object {
 }
 
 func (a Array) indentedString(level int) string {
+	elemsStrs := make([]string, len(a))
+	indentStr := strings.Repeat("\t", level)
 
-	logstr := []string{"["}
-	tabstr := strings.Repeat("\t", level)
-	first := true
-	sepstr := ""
-
-	for _, entry := range a {
-
-		if first {
-			first = false
-			sepstr = ""
+	skipNextSep := false
+	for i, elem := range a {
+		sepStr := ""
+		if i == 0 || skipNextSep {
+			sepStr = ""
+			skipNextSep = false
 		} else {
-			sepstr = " "
+			sepStr = " "
 		}
 
-		switch entry := entry.(type) {
+		switch elem := elem.(type) {
 		case Dict:
-			dictstr := entry.indentedString(level + 1)
-			logstr = append(logstr, fmt.Sprintf("\n%[1]s%[2]s\n%[1]s", tabstr, dictstr))
-			first = true
+			dictStr := elem.indentedString(level + 1)
+			elemsStrs[i] = fmt.Sprintf("\n%[1]s%[2]s\n%[1]s", indentStr, dictStr)
+			skipNextSep = true
 		case Array:
-			arrstr := entry.indentedString(level + 1)
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, arrstr))
+			arrStr := elem.indentedString(level + 1)
+			elemsStrs[i] = fmt.Sprintf("%s%s", sepStr, arrStr)
+		case Name:
+			elemStr, _ := DecodeName(string(elem))
+			elemsStrs[i] = fmt.Sprintf("%s%s", sepStr, elemStr)
+		case nil:
+			elemsStrs[i] = fmt.Sprintf("%s%s", sepStr, "null")
 		default:
-			v := "null"
-			if entry != nil {
-				v = entry.String()
-				if n, ok := entry.(Name); ok {
-					v, _ = DecodeName(string(n))
-				}
-			}
-
-			logstr = append(logstr, fmt.Sprintf("%s%v", sepstr, v))
+			elemsStrs[i] = fmt.Sprintf("%s%v", sepStr, elem.String())
 		}
 	}
 
-	logstr = append(logstr, "]")
-
-	return strings.Join(logstr, "")
+	return "[" + strings.Join(elemsStrs, "") + "]"
 }
 
 func (a Array) String() string {
