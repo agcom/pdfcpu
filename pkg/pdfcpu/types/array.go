@@ -18,10 +18,7 @@ package types
 
 import (
 	"fmt"
-
 	"strings"
-
-	"github.com/pdfcpu/pdfcpu/pkg/log"
 )
 
 // Array represents a PDF array object.
@@ -147,50 +144,16 @@ func (a Array) String() string {
 
 // PDFString returns a string representation as found in and written to a PDF file.
 func (a Array) PDFString() string {
-
-	logstr := []string{}
-	logstr = append(logstr, "[")
-	first := true
-	var sepstr string
-
-	for _, entry := range a {
-
-		if first {
-			first = false
-			sepstr = ""
-		} else {
-			sepstr = " "
-		}
-
-		switch entry := entry.(type) {
+	elemsStrs := make([]string, len(a))
+	for i, elem := range a {
+		switch elem := elem.(type) {
 		case nil:
-			logstr = append(logstr, fmt.Sprintf("%snull", sepstr))
-		case Dict:
-			logstr = append(logstr, entry.PDFString())
-		case Array:
-			logstr = append(logstr, entry.PDFString())
-		case IndirectRef:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case Name:
-			logstr = append(logstr, entry.PDFString())
-		case Integer:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case Float:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case Boolean:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case StringLiteral:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case HexLiteral:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
+			elemsStrs[i] = "null"
 		default:
-			if log.InfoEnabled() {
-				log.Info.Fatalf("PDFArray.PDFString(): entry of unknown object type: %[1]T %[1]v\n", entry)
-			}
+			elemsStrs[i] = elem.PDFString()
 		}
 	}
 
-	logstr = append(logstr, "]")
-
-	return strings.Join(logstr, "")
+	arrStr := strings.Join(elemsStrs, " ")
+	return "[" + arrStr + "]"
 }
