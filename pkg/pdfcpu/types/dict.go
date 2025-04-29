@@ -22,7 +22,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pdfcpu/pdfcpu/pkg/log"
 	"github.com/pkg/errors"
 )
 
@@ -474,51 +473,27 @@ func (d Dict) indentedString(level int) string {
 
 // PDFString returns a string representation as found in and written to a PDF file.
 func (d Dict) PDFString() string {
+	kvs := make([]string, 0, len(d))
 
-	logstr := []string{} //make([]string, 20)
-	logstr = append(logstr, "<<")
-
-	var keys []string
+	keys := make([]string, 0, len(d))
 	for k := range d {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
 	for _, k := range keys {
-
+		kName := EncodeName(k)
 		v := d[k]
-		keyName := EncodeName(k)
 
 		switch v := v.(type) {
 		case nil:
-			logstr = append(logstr, fmt.Sprintf("/%s null", keyName))
-		case Dict:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case Array:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case IndirectRef:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Name:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case Integer:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Float:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Boolean:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case StringLiteral:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case HexLiteral:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
+			kvs = append(kvs, fmt.Sprintf("/%s null", kName))
 		default:
-			if log.InfoEnabled() {
-				log.Info.Fatalf("PDFDict.PDFString(): entry of unknown object type: %T %[1]v\n", v)
-			}
+			kvs = append(kvs, fmt.Sprintf("/%s %s", kName, v.PDFString()))
 		}
 	}
 
-	logstr = append(logstr, ">>")
-	return strings.Join(logstr, "")
+	return "<<" + strings.Join(kvs, " ") + ">>"
 }
 
 func (d Dict) String() string {
