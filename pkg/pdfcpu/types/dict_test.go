@@ -30,3 +30,24 @@ func TestEncodeDict(t *testing.T) {
 		t.Errorf("expected %s for %+v, got %s", expected, dict, s)
 	}
 }
+
+func TestDict_PDFString(t *testing.T) {
+	tests := []struct {
+		name string
+		d    Dict
+		want string
+	}{
+		{
+			name: "kv kv",
+			d:    Dict(map[string]Object{"k1": Name("v1"), "k2": Name("v2")}),
+			want: "<</k1 /v1 /k2 /v2>>",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.d.PDFString(); got != tt.want {
+				t.Errorf("PDFString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
