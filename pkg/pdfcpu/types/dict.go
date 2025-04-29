@@ -432,43 +432,37 @@ func (d *Dict) Increment(key string) error {
 }
 
 func (d Dict) indentedString(level int) string {
+	kvs := make([]string, 0, len(d))
+	kvIndent := strings.Repeat("\t", level)
 
-	logstr := []string{"<<\n"}
-	tabstr := strings.Repeat("\t", level)
-
-	var keys []string
+	keys := make([]string, 0, len(d))
 	for k := range d {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
 	for _, k := range keys {
-
 		v := d[k]
 
+		var vStr string
 		switch v := v.(type) {
 		case Dict:
-			dictStr := v.indentedString(level + 1)
-			logstr = append(logstr, fmt.Sprintf("%s<%s, %s>\n", tabstr, k, dictStr))
+			vStr = v.indentedString(level + 1)
 		case Array:
-			arrStr := v.indentedString(level + 1)
-			logstr = append(logstr, fmt.Sprintf("%s<%s, %s>\n", tabstr, k, arrStr))
+			vStr = v.indentedString(level + 1)
+		case nil:
+			vStr = "null"
+		case Name:
+			vStr, _ = DecodeName(v.String())
 		default:
-			val := "null"
-			if v != nil {
-				val = v.String()
-				if n, ok := v.(Name); ok {
-					val, _ = DecodeName(string(n))
-				}
-			}
-
-			logstr = append(logstr, fmt.Sprintf("%s<%s, %v>\n", tabstr, k, val))
+			vStr = v.String()
 		}
+
+		kvs = append(kvs, fmt.Sprintf("%s<%s, %s>", kvIndent, k, vStr))
 	}
 
-	logstr = append(logstr, fmt.Sprintf("%s%s", strings.Repeat("\t", level-1), ">>"))
-
-	return strings.Join(logstr, "")
+	// TODO: shouldn't the `"<<\n"` be preceded by `strings.Repeat("\t", level-1)`?
+	return "<<\n" + strings.Join(kvs, "\n") + "\n" + strings.Repeat("\t", level-1) + ">>"
 }
 
 // PDFString returns a string representation as found in and written to a PDF file.
