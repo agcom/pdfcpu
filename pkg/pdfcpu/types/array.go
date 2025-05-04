@@ -147,28 +147,29 @@ func (a Array) String() string {
 
 // PDFString returns a string representation as found in and written to a PDF file.
 func (a Array) PDFString() string {
-	logstr := make([]string, 0, len(a))
-	for i, entry := range a {
-		var sepstr string
+	elems := make([]string, 0, len(a))
+
+	for i, elem := range a {
+		var sep string
 		if i == 0 {
-			sepstr = ""
+			sep = ""
 		} else {
-			sepstr = " "
+			sep = " "
 		}
 
-		switch entry := entry.(type) {
+		switch elem := elem.(type) {
 		case nil:
-			logstr = append(logstr, fmt.Sprintf("%snull", sepstr))
+			elems = append(elems, fmt.Sprintf("%snull", sep))
 		case Dict, Array, Name:
-			logstr = append(logstr, entry.PDFString())
+			elems = append(elems, elem.PDFString())
 		case IndirectRef, Integer, Float, Boolean, StringLiteral, HexLiteral:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
+			elems = append(elems, fmt.Sprintf("%s%s", sep, elem.PDFString()))
 		default:
 			if log.InfoEnabled() {
-				log.Info.Fatalf("PDFArray.PDFString(): entry of unknown object type: %[1]T %[1]v\n", entry)
+				log.Info.Fatalf("PDFArray.PDFString(): entry of unknown object type: %[1]T %[1]v\n", elem)
 			}
 		}
 	}
 
-	return "[" + strings.Join(logstr, "") + "]"
+	return "[" + strings.Join(elems, "") + "]"
 }

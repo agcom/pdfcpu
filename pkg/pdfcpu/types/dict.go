@@ -474,25 +474,24 @@ func (d Dict) indentedString(level int) string {
 
 // PDFString returns a string representation as found in and written to a PDF file.
 func (d Dict) PDFString() string {
-	logstr := make([]string, 0, len(d))
-
-	keys := make([]string, 0, len(d))
+	ks := make([]string, 0, len(d))
 	for k := range d {
-		keys = append(keys, k)
+		ks = append(ks, k)
 	}
-	sort.Strings(keys)
+	sort.Strings(ks)
 
-	for _, k := range keys {
+	kvs := make([]string, 0, len(d))
+	for _, k := range ks {
 		v := d[k]
-		keyName := EncodeName(k)
+		kEncName := EncodeName(k)
 
 		switch v := v.(type) {
 		case nil:
-			logstr = append(logstr, fmt.Sprintf("/%s null", keyName))
+			kvs = append(kvs, fmt.Sprintf("/%s null", kEncName))
 		case Dict, Array, Name, StringLiteral, HexLiteral:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
+			kvs = append(kvs, fmt.Sprintf("/%s%s", kEncName, v.PDFString()))
 		case IndirectRef, Integer, Float, Boolean:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
+			kvs = append(kvs, fmt.Sprintf("/%s %s", kEncName, v.PDFString()))
 		default:
 			if log.InfoEnabled() {
 				log.Info.Fatalf("PDFDict.PDFString(): entry of unknown object type: %T %[1]v\n", v)
@@ -500,7 +499,7 @@ func (d Dict) PDFString() string {
 		}
 	}
 
-	return "<<" + strings.Join(logstr, "") + ">>"
+	return "<<" + strings.Join(kvs, "") + ">>"
 }
 
 func (d Dict) String() string {
