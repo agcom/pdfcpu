@@ -22,7 +22,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pdfcpu/pdfcpu/pkg/log"
 	"github.com/pkg/errors"
 )
 
@@ -493,9 +492,7 @@ func (d Dict) PDFString() string {
 		case IndirectRef, Integer, Float, Boolean:
 			kvs = append(kvs, fmt.Sprintf("/%s %s", kEncName, v.PDFString()))
 		default:
-			if log.InfoEnabled() {
-				log.Info.Fatalf("PDFDict.PDFString(): entry of unknown object type: %T %[1]v\n", v)
-			}
+			kvs = append(kvs, fmt.Sprintf("/%s %s", kEncName, v.PDFString()))
 		}
 	}
 

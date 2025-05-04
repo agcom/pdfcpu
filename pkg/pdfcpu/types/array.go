@@ -20,8 +20,6 @@ import (
 	"fmt"
 
 	"strings"
-
-	"github.com/pdfcpu/pdfcpu/pkg/log"
 )
 
 // Array represents a PDF array object.
@@ -165,9 +163,7 @@ func (a Array) PDFString() string {
 		case IndirectRef, Integer, Float, Boolean, StringLiteral, HexLiteral:
 			elems = append(elems, fmt.Sprintf("%s%s", sep, elem.PDFString()))
 		default:
-			if log.InfoEnabled() {
-				log.Info.Fatalf("PDFArray.PDFString(): entry of unknown object type: %[1]T %[1]v\n", elem)
-			}
+			elems = append(elems, fmt.Sprintf("%s%s", sep, elem.PDFString()))
 		}
 	}
 
