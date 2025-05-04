@@ -461,11 +461,7 @@ func (nameObject Name) String() string {
 
 // PDFString returns a string representation as found in and written to a PDF file.
 func (nameObject Name) PDFString() string {
-	s := " "
-	if len(nameObject) > 0 {
-		s = EncodeName(string(nameObject))
-	}
-	return fmt.Sprintf("/%s", s)
+	return fmt.Sprintf("/%s", EncodeName(string(nameObject)))
 }
 
 // Value returns a string value for this PDF object.
