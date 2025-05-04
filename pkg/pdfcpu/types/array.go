@@ -147,8 +147,7 @@ func (a Array) String() string {
 
 // PDFString returns a string representation as found in and written to a PDF file.
 func (a Array) PDFString() string {
-	logstr := make([]string, 0, len(a)+2) // +2 for "[" and "]".
-	logstr = append(logstr, "[")
+	logstr := make([]string, 0, len(a))
 	for i, entry := range a {
 		var sepstr string
 		if i == 0 {
@@ -171,7 +170,5 @@ func (a Array) PDFString() string {
 		}
 	}
 
-	logstr = append(logstr, "]")
-
-	return strings.Join(logstr, "")
+	return "[" + strings.Join(logstr, "") + "]"
 }
