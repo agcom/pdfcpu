@@ -18,23 +18,20 @@ package pdfcpu
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 	"github.com/pkg/errors"
 )
 
 func sigDictPDFString(d types.Dict) string {
-	s := []string{}
-	s = append(s, "<<")
-	s = append(s, fmt.Sprintf("/ByteRange%-62v", d["ByteRange"].PDFString()))
-	s = append(s, fmt.Sprintf("/Contents%s", d["Contents"].PDFString()))
-	s = append(s, fmt.Sprintf("/Type%s", d["Type"].PDFString()))
-	s = append(s, fmt.Sprintf("/Filter%s", d["Filter"].PDFString()))
-	s = append(s, fmt.Sprintf("/SubFilter%s", d["SubFilter"].PDFString()))
-	s = append(s, ">>")
-	return strings.Join(s, "")
+	return fmt.Sprintf(
+		"<</ByteRange %-62s /Contents %s /Type %s /Filter %s /SubFilter %s>>",
+		d["ByteRange"].PDFString(),
+		d["Contents"].PDFString(),
+		d["Type"].PDFString(),
+		d["Filter"].PDFString(),
+		d["SubFilter"].PDFString(),
+	)
 }
 
 func writeSigDict(ctx *model.Context, ir types.IndirectRef) error {
@@ -78,17 +75,20 @@ func writeSigDict(ctx *model.Context, ir types.IndirectRef) error {
 		return err
 	}
 
-	// <</ByteRange[]
-	w.OffsetSigByteRange = w.Offset + int64(written) + 2 + 10
+	// <</ByteRange []
+	w.OffsetSigByteRange = w.Offset + int64(written) + 2 + 10 + 1
 	// 2 for "<<"
 	// 10 for "/ByteRange"
+	// 1 for " "
 
-	// [...]/Contents<00..... maxSigContentsBytes>
-	w.OffsetSigContents = w.OffsetSigByteRange + 1 + 60 + 1 + 9
+	// [...] /Contents<00..... maxSigContentsBytes>
+	w.OffsetSigContents = w.OffsetSigByteRange + 1 + 60 + 1 + 1 + 9 + 1
 	// 1 for "["
 	// 60 for max 60 chars within this array PDF string.
 	// 1 for "]"
-	// 9 for "/Contents<"
+	// 1 for " "
+	// 9 for "/Contents"
+	// 1 for " "
 
 	i, err := w.WriteString(sigDictPDFString(d))
 	if err != nil {
