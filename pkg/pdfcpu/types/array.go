@@ -148,20 +148,22 @@ func (a Array) PDFString() string {
 	elems := make([]string, 0, len(a))
 
 	for i, elem := range a {
-		var sep string
-		if i == 0 {
-			sep = ""
+		var elemPdfStr string
+		if elem == nil {
+			elemPdfStr = "null"
 		} else {
-			sep = " "
+			elemPdfStr = elem.PDFString()
 		}
 
-		switch elem := elem.(type) {
-		case nil:
-			elems = append(elems, fmt.Sprintf("%snull", sep))
+		switch elem.(type) {
 		case Dict, Array, Name:
-			elems = append(elems, elem.PDFString())
+			elems = append(elems, elemPdfStr)
 		default:
-			elems = append(elems, fmt.Sprintf("%s%s", sep, elem.PDFString()))
+			if i == 0 {
+				elems = append(elems, elemPdfStr)
+			} else {
+				elems = append(elems, " "+elemPdfStr)
+			}
 		}
 	}
 

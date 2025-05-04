@@ -481,16 +481,21 @@ func (d Dict) PDFString() string {
 
 	kvs := make([]string, 0, len(d))
 	for _, k := range ks {
-		v := d[k]
 		kEncName := EncodeName(k)
 
-		switch v := v.(type) {
-		case nil:
-			kvs = append(kvs, fmt.Sprintf("/%s null", kEncName))
+		v := d[k]
+		var vPdfStr string
+		if v == nil {
+			vPdfStr = "null"
+		} else {
+			vPdfStr = v.PDFString()
+		}
+
+		switch v.(type) {
 		case Dict, Array, Name, StringLiteral, HexLiteral:
-			kvs = append(kvs, fmt.Sprintf("/%s%s", kEncName, v.PDFString()))
+			kvs = append(kvs, fmt.Sprintf("/%s%s", kEncName, vPdfStr))
 		default:
-			kvs = append(kvs, fmt.Sprintf("/%s %s", kEncName, v.PDFString()))
+			kvs = append(kvs, fmt.Sprintf("/%s %s", kEncName, vPdfStr))
 		}
 	}
 
