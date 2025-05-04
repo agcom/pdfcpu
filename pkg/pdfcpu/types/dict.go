@@ -474,11 +474,10 @@ func (d Dict) indentedString(level int) string {
 
 // PDFString returns a string representation as found in and written to a PDF file.
 func (d Dict) PDFString() string {
-
-	logstr := []string{} //make([]string, 20)
+	logstr := make([]string, 0, len(d)+2) // +2 for "<<" and ">>".
 	logstr = append(logstr, "<<")
 
-	var keys []string
+	keys := make([]string, 0, len(d))
 	for k := range d {
 		keys = append(keys, k)
 	}
