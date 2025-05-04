@@ -160,23 +160,9 @@ func (a Array) PDFString() string {
 		switch entry := entry.(type) {
 		case nil:
 			logstr = append(logstr, fmt.Sprintf("%snull", sepstr))
-		case Dict:
+		case Dict, Array, Name:
 			logstr = append(logstr, entry.PDFString())
-		case Array:
-			logstr = append(logstr, entry.PDFString())
-		case IndirectRef:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case Name:
-			logstr = append(logstr, entry.PDFString())
-		case Integer:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case Float:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case Boolean:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case StringLiteral:
-			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
-		case HexLiteral:
+		case IndirectRef, Integer, Float, Boolean, StringLiteral, HexLiteral:
 			logstr = append(logstr, fmt.Sprintf("%s%s", sepstr, entry.PDFString()))
 		default:
 			if log.InfoEnabled() {

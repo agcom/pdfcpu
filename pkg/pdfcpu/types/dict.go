@@ -484,31 +484,16 @@ func (d Dict) PDFString() string {
 	sort.Strings(keys)
 
 	for _, k := range keys {
-
 		v := d[k]
 		keyName := EncodeName(k)
 
 		switch v := v.(type) {
 		case nil:
 			logstr = append(logstr, fmt.Sprintf("/%s null", keyName))
-		case Dict:
+		case Dict, Array, Name, StringLiteral, HexLiteral:
 			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case Array:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case IndirectRef:
+		case IndirectRef, Integer, Float, Boolean:
 			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Name:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case Integer:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Float:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Boolean:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case StringLiteral:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case HexLiteral:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
 		default:
 			if log.InfoEnabled() {
 				log.Info.Fatalf("PDFDict.PDFString(): entry of unknown object type: %T %[1]v\n", v)
