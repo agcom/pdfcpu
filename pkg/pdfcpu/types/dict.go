@@ -489,8 +489,6 @@ func (d Dict) PDFString() string {
 			kvs = append(kvs, fmt.Sprintf("/%s null", kEncName))
 		case Dict, Array, Name, StringLiteral, HexLiteral:
 			kvs = append(kvs, fmt.Sprintf("/%s%s", kEncName, v.PDFString()))
-		case IndirectRef, Integer, Float, Boolean:
-			kvs = append(kvs, fmt.Sprintf("/%s %s", kEncName, v.PDFString()))
 		default:
 			kvs = append(kvs, fmt.Sprintf("/%s %s", kEncName, v.PDFString()))
 		}

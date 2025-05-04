@@ -160,8 +160,6 @@ func (a Array) PDFString() string {
 			elems = append(elems, fmt.Sprintf("%snull", sep))
 		case Dict, Array, Name:
 			elems = append(elems, elem.PDFString())
-		case IndirectRef, Integer, Float, Boolean, StringLiteral, HexLiteral:
-			elems = append(elems, fmt.Sprintf("%s%s", sep, elem.PDFString()))
 		default:
 			elems = append(elems, fmt.Sprintf("%s%s", sep, elem.PDFString()))
 		}
