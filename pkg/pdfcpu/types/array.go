@@ -149,13 +149,9 @@ func (a Array) String() string {
 func (a Array) PDFString() string {
 	logstr := make([]string, 0, len(a)+2) // +2 for "[" and "]".
 	logstr = append(logstr, "[")
-	first := true
-	var sepstr string
-
-	for _, entry := range a {
-
-		if first {
-			first = false
+	for i, entry := range a {
+		var sepstr string
+		if i == 0 {
 			sepstr = ""
 		} else {
 			sepstr = " "
