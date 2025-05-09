@@ -571,7 +571,11 @@ func fillCheckBoxKid(ctx *model.Context, kids types.Array, off bool) (*types.Nam
 		return nil, errors.New("pdfcpu: corrupt AP field: missing entry N")
 	}
 
-	offName, yesName := primitives.CalcCheckBoxASNames(d2)
+	offName, yesName, err := primitives.CalcCheckBoxASNames(ctx, d2)
+	if err != nil {
+		return nil, err
+	}
+
 	asName := yesName
 	if off {
 		asName = offName
@@ -588,7 +592,6 @@ func fillCheckBox(
 	ctx *model.Context,
 	d types.Dict,
 	id, name string,
-	opts []string,
 	locked bool,
 	format DataFormat,
 	fillDetails func(id, name string, fieldType FieldType, format DataFormat) ([]string, bool, bool),
@@ -639,7 +642,10 @@ func fillCheckBox(
 
 	d["V"] = v
 	if _, found := d.Find("AS"); found {
-		offName, yesName := primitives.CalcCheckBoxASNames(d)
+		offName, yesName, err := primitives.CalcCheckBoxASNames(ctx, d)
+		if err != nil {
+			return err
+		}
 		//fmt.Printf("off:<%s> yes:<%s>\n", offName, yesName)
 		asName := yesName
 		if v == "Off" {
@@ -676,7 +682,7 @@ func fillBtn(
 			return err
 		}
 	} else {
-		if err := fillCheckBox(ctx, d, id, name, opts, locked, format, fillDetails, ok); err != nil {
+		if err := fillCheckBox(ctx, d, id, name, locked, format, fillDetails, ok); err != nil {
 			return err
 		}
 	}
@@ -1170,7 +1176,7 @@ func setupFillFonts(xRefTable *model.XRefTable) error {
 
 	for k, v := range d {
 		indRef := v.(types.IndirectRef)
-		fontName, _, err := primitives.FormFontNameAndLangForID(xRefTable, indRef)
+		fontName, _, _, err := primitives.FormFontDetails(xRefTable, indRef)
 		if err != nil {
 			return err
 		}
